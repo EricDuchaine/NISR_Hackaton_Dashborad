@@ -73,3 +73,5 @@ Author
 •	Eric Duchaine Manishimwe
 •	Francios Xavier Jules Mugabushaka
 
+N.B: Consider only updated video and script that contains map of Rwanda.
+
