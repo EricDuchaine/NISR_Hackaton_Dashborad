@@ -11,6 +11,9 @@ if (!require("tidyverse")) install.packages("tidyverse")
 if (!require("skimr")) install.packages("skimr")
 if (!require("reshape2")) install.packages("reshape2")
 if (!require("plotly")) install.packages("plotly")
+if (!requireNamespace("leaflet", quietly = TRUE)) {
+  install.packages("leaflet")
+}
 
 library(shinydashboard)
 library(plotly)
@@ -24,13 +27,14 @@ library(forecast)
 library(lubridate)
 library(tidyverse)
 library(skimr)
+library(leaflet)
 
 # Install and load the readxl package
 install.packages("readxl")
 library(readxl)
 
 # Replace 'your_file.xlsx' with the actual path to your Excel file 
-excel_file <- "C:/Users/ERIC/Downloads/labor force data.xlsx"
+excel_file <- "C:/Users/USER/Downloads/FaxaData Hackaton/labor force data.xlsx"
 
 # Define the sheet names you want to import (A to J)
 sheet_names <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J")
@@ -44,11 +48,21 @@ for (sheet_name in sheet_names) {
   data_frames[[sheet_name]] <- data
 }
 
-# Define the UI
+# Create a dataset for the map
+rwanda_data <- data.frame(
+  Province = c("Kigali", "Southern", "Northern", "Eastern", "Western"),
+  lat = c(-1.9441, -2.5894, -1.9472, -2.2167, -2.4923),
+  lon = c(30.0619, 29.7341, 30.0588, 30.5379, 28.8954),
+  employed_population = c(647629, 811479, 599887, 837313, 650043)
+)
+
 # Define the UI
 ui <- dashboardPage(
   dashboardHeader(title = "Labor Force Survey Dashboard"),
-  dashboardSidebar(),
+  dashboardSidebar(
+    # Add a selectInput for Province
+    selectInput("province", "Select Province", choices = unique(data_frames[["B"]]$Province))
+  ),
   dashboardBody(
     tabsetPanel(
       tabPanel("Employed Population by Educational Group", plotlyOutput("chart_b")),
@@ -57,7 +71,8 @@ ui <- dashboardPage(
       tabPanel("Number of Male employed in various industries in Rwanda", plotlyOutput("chart_e")),
       tabPanel("Number of Female employed in various industries in Rwanda", plotlyOutput("chart_f")),
       tabPanel("Labour Force Participation Rate by Province in 2022", plotlyOutput("chart_g")),
-      tabPanel("Employed and Unemployed Population by Province in 2022", plotlyOutput("chart_h"))
+      tabPanel("Employed and Unemployed Population by Province in 2022", plotlyOutput("chart_h")),
+      tabPanel("Employement by Province(Rwanda)", leafletOutput("map"))
     )
   )
 )
@@ -205,9 +220,20 @@ server <- function(input, output) {
         color = "Category"
       ) +
       theme_minimal() +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1)) # Close this line with a closing parenthesis
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
     
-    ggplotly(p) # Close this line with a closing parenthesis
+    ggplotly(p)
+  })
+  
+  # Render the leaflet map
+  output$map <- renderLeaflet({
+    leaflet(data = rwanda_data) %>%
+      addTiles() %>%
+      addMarkers(
+        ~lon, ~lat,
+        label = ~paste(Province, "<br>", "Employed Population:", employed_population),
+        popup = ~paste(Province, "<br>", "Employed Population:", employed_population)
+      )
   })
 }
 
