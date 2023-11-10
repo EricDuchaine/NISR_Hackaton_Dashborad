@@ -1,7 +1,7 @@
 # NISR_Hackaton_Dashborad
 NISR DASHBOARD
 
-Labor Force Survey Dashboard
+Rwanda Labor Force Survey 2022 Dashboard
 
 Introduction
 
@@ -55,6 +55,9 @@ The dashboard offers the following features:
 •	Visualizations of the number of females employed in various industries.
 •	Visualizations of labor force participation rate by province.
 •	Visualizations of employed and unemployed populations by province.
+and last visual shows
+- Employment by Province of Rwanda using Map 
+
 
 
 How to Navigate
